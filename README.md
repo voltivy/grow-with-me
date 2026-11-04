@@ -22,7 +22,7 @@ This project was developed as a personal game development experiment to explore 
 
 ## Play the Game
 
-**Play online:** [Grow With Me](YOUR-GAME-LINK-HERE)
+**Play online:** [Grow With Me](https://voltivy.github.io/grow-with-me/)
 
 The game runs directly in your browser. No installation is required.
 
