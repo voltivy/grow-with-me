@@ -1,0 +1,4 @@
+{ "name": "grow-with-me", "version": "1.0.0", "main": "main.js",
+  "scripts": { "start": "electron .", "build": "electron-builder --win" },
+  "devDependencies": { "electron": "^33.0.0", "electron-builder": "^25.0.0" },
+  "build": { "appId": "com.growwithme.garden", "productName": "Grow With Me", "files": ["index.html","main.js"] } }
