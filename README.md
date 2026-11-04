@@ -1,4 +1,4 @@
-# 🌱 Grow With Me
+#  Grow With Me
 
 <p align="center">
   <i>"Some things just need a little time, patience, and love to bloom."</i>
