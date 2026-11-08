@@ -1,4 +1,4 @@
-/* ============ CONFIG: write your own words here ============ */
+/* ============ CONFIg ============ */
 const CONFIG = {
   to: "you",
   from: "me",
@@ -21,5 +21,10 @@ const CONFIG = {
   butterflyMessage: "The butterfly whispered: you make ordinary days feel like something worth keeping.",
   pairMessage: "Two flowers grew side by side, and a new seed appeared between them.",
   letter: "i made you a little garden.\n\nevery flower is a little reminder that even the smallest things can become something beautiful when you give them time.\n\nand if I could, i'd keep planting flowers here with you forever.",
+  // Optional: your own background music. Paste a direct link to an .mp3 (for example a catbox link
+  // like "https://files.catbox.moe/abc123.mp3") or a file in this folder like "music.mp3". Leave "" for the built-in music.
+  musicUrl: "musicmusic.mp3",
+  musicVolume: 0.25,   // background music loudness, 0 (silent) to 1 (full)
+  sfxVolume: 1.5,      // click, water and bloom sounds. Raise it if they are hard to hear.
   ending: "Thank you for taking the time to grow this with me."
 };

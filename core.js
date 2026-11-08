@@ -1,5 +1,5 @@
-/* Data, saving and sound */
-/* ============ Data ============ */
+
+/* ============ data ============ */
 const SPECIES = {
   daisy:      {name:"Daisy",         line:"Cheerful and unbothered. Blooms for almost anyone.", color:"#F4EEF8", stem:14},
   tulip:      {name:"Tulip",         line:"Shy at first, then all at once.",                  color:"#D9708F", stem:17},
@@ -50,10 +50,10 @@ const allBloomed = ()=>BASE.every(s=>S.bloomedSp[s]);
 const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* ============ Sound (tiny, generated, starts after a click) ============ */
-let AC=null, master=null, musicOn=false, musicTimer=null;
+let AC=null, master=null, musicOn=false, musicTimer=null, bgm=null, bgmFailed=false;
 function audio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.5;master.connect(AC.destination);}catch(e){AC=null;}}
   if(AC&&AC.state==="suspended")AC.resume();return AC;}
-function tone(f,t0,dur,type="sine",vol=.12){const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;
+function tone(f,t0,dur,type="sine",vol=.12,fx=true){const a=audio();if(!a)return;vol*=fx?(CONFIG.sfxVolume||1):1;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;
   g.gain.setValueAtTime(0,a.currentTime+t0);g.gain.linearRampToValueAtTime(vol,a.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t0+dur);
   o.connect(g);g.connect(master);o.start(a.currentTime+t0);o.stop(a.currentTime+t0+dur+.05);}
 const N = {c4:262,d4:294,e4:330,g4:392,a4:440,c5:523,d5:587,e5:659,g5:784,a5:880,c6:1047};
@@ -67,6 +67,9 @@ function sfx(k){
   else if(k==="dig"){tone(160,0,.1,"sawtooth",.04);}
 }
 function music(on){musicOn=on;clearTimeout(musicTimer);const b=$("#btn-music");b.textContent="Music: "+(on?"on":"off");b.setAttribute("aria-pressed",on);b.classList.toggle("on",on);
-  if(!on)return;audio();const scale=[N.c4,N.d4,N.e4,N.g4,N.a4,N.c5,N.d5,N.e5];let i=0;
-  (function step(){if(!musicOn)return;const f=scale[(Math.random()*scale.length)|0];tone(f,0,1.8,"sine",.045);
-    if(i%4===0)tone(f/2,0,2.4,"triangle",.03);i++;musicTimer=setTimeout(step,1100+Math.random()*900);})();}
+  if(bgm)bgm.pause();
+  if(!on)return;
+  if(CONFIG.musicUrl&&!bgmFailed){if(!bgm){bgm=new Audio(CONFIG.musicUrl);bgm.loop=true;bgm.volume=Math.min(1,Math.max(0,CONFIG.musicVolume==null?.25:CONFIG.musicVolume));bgm.addEventListener("error",()=>{bgmFailed=true;bgm=null;if(musicOn)music(true);});}bgm.play().catch(()=>{});return;}
+  audio();const scale=[N.c4,N.d4,N.e4,N.g4,N.a4,N.c5,N.d5,N.e5];let i=0;
+  (function step(){if(!musicOn)return;const f=scale[(Math.random()*scale.length)|0];tone(f,0,1.8,"sine",.03,false);
+    if(i%4===0)tone(f/2,0,2.4,"triangle",.02,false);i++;musicTimer=setTimeout(step,1100+Math.random()*900);})();}
