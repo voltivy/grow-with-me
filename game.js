@@ -1,5 +1,5 @@
-
-/* ============ dialog ============ */
+/* Game logic, input, screens, main loop */
+/* ============ Dialog ============ */
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const dlgs = {g:{box:$("#dlg"),who:$("#dlg-who"),txt:$("#dlg-txt"),timer:null,full:""},
               s:{box:$("#dlg2"),who:$("#dlg2-who"),txt:$("#dlg2-txt"),timer:null,full:""}};
@@ -11,7 +11,7 @@ function say(who,text,k="g"){
 Object.values(dlgs).forEach(d=>d.box.addEventListener("click",()=>{
   if(d.txt.textContent.length<d.full.length){clearInterval(d.timer);d.txt.textContent=d.full;}else d.box.classList.remove("show");sfx("tap");}));
 
-
+/* ============ Status line ============ */
 let flash="",flashUntil=0;
 function setStatus(t,ms=3200){flash=t;flashUntil=performance.now()+ms;renderStatus();}
 function guide(){
@@ -34,7 +34,7 @@ function renderStatus(){
   if(el._last!==t){el.innerHTML=t;el._last=t;}
 }
 
-
+/* ============ Game logic ============ */
 const st={hover:-1,moonWob:0};
 let digArm=-1,digUntil=0,moonClicks=0,moonLast=0;
 const msgsLeftNote=()=>msgCount()>=TOTAL_MSGS?" The Everlasting Flower is waiting in the Secret Garden.":"";
@@ -69,8 +69,8 @@ function bloom(p,i){
   mile("bloom1","First flower bloomed.");logIt("A "+sp.name+" bloomed.");sfx("bloom");
   spawn(22,{x,y:y-sp.stem,vx:(Math.random()-.5)*70,vy:-Math.random()*50,g:30,life:1.3,max:1.3,col:Math.random()>.5?sp.color:"#F2D98C",type:"star"});
   let extra="";
-  const next=BASE.find(b=>!S.unlocked.includes(b));
-  if(next&&p.sp!=="moonpetal"){S.unlocked.push(next);extra=" A "+SPECIES[next].name+" seed turned up in the Seeds screen.";logIt("Found a "+SPECIES[next].name+" seed.");}
+  const got=unlockPass();
+  if(got.length)extra=" A "+SPECIES[got[0]].name+" seed turned up in the Seeds screen.";
   if(allBloomed()&&!S.miles.allspecies){mile("allspecies","Every kind of flower has bloomed.");extra+=" Something stirs at the edge of the garden. Try the Secret Garden tab.";}
   checkPair();
   say(sp.name,"A "+sp.name+" bloomed. Click it to see what it holds."+extra);
@@ -78,8 +78,8 @@ function bloom(p,i){
 }
 function checkPair(){
   if(S.pair)return;
-  for(let i=0;i<6;i++){const a=S.plots[i];if(!a||a.stage<3)continue;
-    [[i%3<2?i+1:-1],[i<3?i+3:-1]].forEach(([j])=>{if(j<0)return;const b=S.plots[j];
+  for(let i=0;i<8;i++){const a=S.plots[i];if(!a||a.stage<3)continue;
+    [[i%4<3?i+1:-1],[i<4?i+4:-1]].forEach(([j])=>{if(j<0)return;const b=S.plots[j];
       if(b&&b.stage===3&&[a.sp,b.sp].sort().join()==="daisy,sunflower"&&!S.pair){
         S.pair=true;S.unlocked.push("moonpetal");mile("pair","Two flowers grew side by side.");logIt("Found a Moonpetal seed.");
         setTimeout(()=>{say("Garden",cfg().pairMessage+" It's a Moonpetal. Check the Seeds screen.");sfx("found");renderAll();},1400);}});}
@@ -107,14 +107,14 @@ function digAt(i){
   else{digArm=i;digUntil=performance.now()+2500;setStatus("Click again to dig up the "+n+".");}
 }
 
-
+/* ============ Input on the garden canvas ============ */
 const cv=$("#cv"),c1=cv.getContext("2d"),cv2=$("#cv2"),c2=cv2.getContext("2d");
 function lp(e,cvs){const r=cvs.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*200};}
 function hit(p){
   if(Math.hypot(p.x-bf.x,p.y-bf.y)<11)return {k:"bf"};
   if(Math.hypot(p.x-266,p.y-30)<16)return {k:"moon"};
-  if(p.x>8&&p.x<60&&p.y>100&&p.y<146)return {k:"sign"};
-  for(let i=0;i<6;i++){const {x,y}=plotPos(i),pl=S.plots[i],top=pl&&pl.stage>1?y-SPECIES[pl.sp].stem-12:y-10;
+  if(p.x>0&&p.x<54&&p.y>100&&p.y<146)return {k:"sign"};
+  for(let i=0;i<8;i++){const {x,y}=plotPos(i),pl=S.plots[i],top=pl&&pl.stage>1?y-SPECIES[pl.sp].stem-12:y-10;
     if(p.x>x-19&&p.x<x+19&&p.y>top&&p.y<y+8)return {k:"plot",i};}
   return null;
 }
@@ -140,7 +140,7 @@ cv2.addEventListener("click",()=>{
   else{sfx("tap");say("The Everlasting Flower","It is still asleep. "+msgCount()+" of "+TOTAL_MSGS+" hidden messages found. Look inside the flowers, and check the moon, the butterfly and the sign.","s");}
 });
 
-/* ============ ending ============ */
+/* ============ Letter & ending ============ */
 function openLetter(){
   const c=cfg();$("#letter").innerHTML=c.letter.split(/\n\s*\n/).map(p=>"<p>"+esc(p)+"</p>").join("")+'<div class="sig">— '+esc(c.from)+"</div>";
   $("#ov-letter").classList.add("show");
@@ -150,9 +150,9 @@ $("#btn-letter-close").addEventListener("click",()=>{$("#ov-letter").classList.r
   if(!S.letterRead){S.letterRead=true;save();$("#end-txt").textContent=cfg().ending;$("#ov-end").classList.add("show");}});
 $("#btn-end-close").addEventListener("click",()=>$("#ov-end").classList.remove("show"));
 
-/* ======================== */
+/* ============ Screens ============ */
 function mk(w,h,fn,cls){const k=document.createElement("canvas");k.width=w;k.height=h;if(cls)k.className=cls;fn(k.getContext("2d"));return k;}
-function spCanvas(sp,stg,cls){return mk(32,40,c=>{R(c,"#3a3350",3,36,26,4);R(c,"#4a3f6b",3,36,26,1);plant(c,sp,stg,16,37,1,0);},cls);}
+function spCanvas(sp,stg,cls){return mk(32,44,c=>{R(c,"#3a3350",3,40,26,4);R(c,"#4a3f6b",3,40,26,1);plant(c,sp,stg,16,41,1,0);},cls);}
 function renderTools(){
   $$("[data-tool]").forEach(b=>b.classList.toggle("on",b.dataset.tool===S.tool));
   cv.className="world t-"+S.tool;
@@ -162,29 +162,29 @@ function renderTools(){
 }
 function renderSeeds(){
   const g=$("#seed-grid");g.innerHTML="";
-  const list=BASE.concat(S.pair?["moonpetal"]:[]);
+  const list=ORDER.concat(S.pair?["moonpetal"]:[]);
   list.forEach((sp,idx)=>{
     const open=S.unlocked.includes(sp),d=SPECIES[sp],card=document.createElement("div");card.className="card panel"+(open?"":" locked");
     const top=document.createElement("div");top.appendChild(spCanvas(sp,3,"hero"));card.appendChild(top);
     const h=document.createElement("h3");h.textContent=open?d.name:"Locked seed";card.appendChild(h);
-    const p=document.createElement("p");p.textContent=open?d.line:"Bloom a "+SPECIES[BASE[idx-1]].name+" to find it.";card.appendChild(p);
+    const p=document.createElement("p");p.textContent=open?d.line:"Bloom a "+SPECIES[ORDER[idx-1]].name+" to find it.";card.appendChild(p);
     if(open){const row=document.createElement("div");row.className="stages";[0,1,2,3].forEach(s=>{const k=spCanvas(sp,s);k.title=STAGE_NAMES[s];row.appendChild(k);});card.appendChild(row);
       const b=document.createElement("button");b.className="pbtn"+(S.seed===sp?" on":" primary");b.textContent=S.seed===sp?"Selected":"Plant this one";
       b.addEventListener("click",()=>{S.seed=sp;S.tool="seed";save();renderTools();go("garden");setStatus(d.name+" seed ready. Click a patch of soil.");});card.appendChild(b);}
     g.appendChild(card);});
-  if(!S.pair){const card=document.createElement("div");card.className="card panel locked";card.appendChild(mk(32,40,c=>{R(c,"#3a3350",3,36,26,4);head(c,"moonpetal",16,20,0);},"hero"));
+  if(!S.pair){const card=document.createElement("div");card.className="card panel locked";card.appendChild(mk(32,44,c=>{R(c,"#3a3350",3,40,26,4);head(c,"moonpetal",16,22,0);},"hero"));
     card.insertAdjacentHTML("beforeend","<h3>A seed you haven't met</h3><p>Some flowers only grow because of who is standing next to them.</p>");g.appendChild(card);}
 }
 function bfIcon(c){R(c,"#2a1830",15,14,2,10);R(c,"#D79BBF",6,8,9,8);R(c,"#D79BBF",17,8,9,8);R(c,"#9C86CE",8,16,7,6);R(c,"#9C86CE",17,16,7,6);R(c,"#f4eaff",9,10,2,2);R(c,"#f4eaff",21,10,2,2);}
 function renderMemories(){
   const g=$("#mem-grid");g.innerHTML="";const c=cfg();
-  const items=BASE.map(sp=>({key:sp,title:SPECIES[sp].name,icon:spCanvas(sp,3,"hero"),text:c.memories[sp]}));
+  const items=BASE.concat(EXTRA).map(sp=>({key:sp,title:SPECIES[sp].name,icon:spCanvas(sp,3,"hero"),text:c.memories[sp]}));
   items.push({key:"moon",title:"The Moon",icon:mk(32,40,x=>x.drawImage(moon,0,4),"hero"),text:c.moonMessage,hide:"Click the moon three times."});
   items.push({key:"butterfly",title:"The Butterfly",icon:mk(32,40,x=>bfIcon(x),"hero"),text:c.butterflyMessage,hide:"Catch it as it drifts by."});
   items.forEach(it=>{const ok=!!S.found[it.key],card=document.createElement("div");card.className="card panel"+(ok?"":" locked");
     card.appendChild(it.icon);const h=document.createElement("h3");h.textContent=ok?it.title:"Not found yet";card.appendChild(h);
     const p=document.createElement("p");if(ok)p.className="hand";p.textContent=ok?it.text:(it.hide||"Bloom a "+it.title+" and click it.");card.appendChild(p);g.appendChild(card);});
-  const n=msgCount();$("#mem-count").textContent=n+" of "+TOTAL_MSGS+" messages found";$("#mem-bar").style.width=(n/TOTAL_MSGS*100)+"%";
+  const n=msgCount();$("#mem-count").textContent=n+" of "+TOTAL_MSGS+" messages found. Bonus flower memories: "+bonusCount()+" of "+EXTRA.length+" (not needed for the Everlasting Flower).";$("#mem-bar").style.width=(n/TOTAL_MSGS*100)+"%";
 }
 const MILES=[["plant1","First seed planted"],["bloom1","First flower bloomed"],["read1","First memory read"],["moon","The moon's secret"],["butterfly","The butterfly's whisper"],
   ["pair","Two flowers side by side"],["allspecies","Every kind of flower bloomed"],["secret","Found the Secret Garden"],["allmsg","Every hidden message found"],["letter","Opened the Everlasting Flower"]];
@@ -208,7 +208,7 @@ function renderSecret(){
 }
 function renderAll(){renderTools();renderSeeds();renderMemories();renderJournal();renderSecret();renderStatus();}
 
-/* ======================== */
+/* ============ Navigation ============ */
 const SCREENS=["garden","seeds","memories","journal","secret"];
 function go(name){
   if(!SCREENS.includes(name))name="garden";
@@ -223,9 +223,9 @@ $$("[data-tool]").forEach(b=>b.addEventListener("click",()=>{S.tool=b.dataset.to
   setStatus(S.tool==="seed"?"Click a patch of soil to plant.":S.tool==="can"?"Click a plant to water it.":"Click a plant to dig it up.");}));
 $("#btn-music").addEventListener("click",()=>{S.music=!musicOn;music(S.music);save();});
 
-/* ======================== */
+/* ============ Personalise ============ */
 const CF=[["to","Their name","text"],["from","Your name","text"],["signMessage","Message on the sign","area"]]
-  .concat(BASE.map(b=>["m_"+b,SPECIES[b].name+" memory","area"])).concat([["moonMessage","Moon's secret","area"],["butterflyMessage","Butterfly's whisper","area"],["letter","The Everlasting letter","area"]]);
+  .concat(ORDER.map(b=>["m_"+b,SPECIES[b].name+" memory","area"])).concat([["moonMessage","Moon's secret","area"],["butterflyMessage","Butterfly's whisper","area"],["letter","The Everlasting letter","area"]]);
 function openCustom(){
   const c=cfg(),val=k=>k.startsWith("m_")?c.memories[k.slice(2)]:c[k];
   $("#custom-form").innerHTML=CF.map(([k,l,t])=>"<label for='cf-"+k+"'>"+l+"</label>"+(t==="text"?"<input type='text' id='cf-"+k+"' value=\""+esc(val(k))+"\">":"<textarea id='cf-"+k+"'>"+esc(val(k))+"</textarea>")).join("");
@@ -237,7 +237,7 @@ $("#btn-custom-save").addEventListener("click",()=>{
   S.custom=o;save();$("#ov-custom").classList.remove("show");renderAll();setStatus("Saved.");});
 $("#btn-custom-reset").addEventListener("click",()=>{S.custom={};save();openCustom();renderAll();});
 
-/* ======================== */
+/* ============ Start, catch-up, loop ============ */
 function catchUp(){
   const away=(Date.now()-S.last)/1000,units=Math.min(5,Math.floor(away/IDLE_SECS));if(units<1)return false;
   let changed=false;S.plots.forEach((p,i)=>{if(!p)return;for(let u=0;u<units&&p.stage<3;u++){p.prog++;changed=true;if(p.prog>=NEED)grow(p,i);}p.water=Math.max(0,p.water-away*.8);});
@@ -252,6 +252,7 @@ $("#btn-begin").addEventListener("click",()=>{
   if(S.music!==false){S.music=true;music(true);}
   save();renderAll();
   if(first)say("Garden","There's one seed waiting for you. Click a patch of soil to plant it, then water it with the can.");
+  else if(S.newStuff){S.newStuff=false;save();say("Garden","The garden got bigger. There are 8 plots now, and 5 new flowers to find: Poppy, Cosmos, Bluebell, Marigold and Iris.");}
   else if(grew)say("Garden","While you were away, the garden grew a little.");
 });
 
@@ -269,7 +270,9 @@ function frame(ms){
   requestAnimationFrame(frame);
 }
 load();
-if(!Array.isArray(S.plots)||S.plots.length!==6)S.plots=Array(6).fill(null);
+if(!Array.isArray(S.plots)||S.plots.length!==8)S.plots=Array(8).fill(null);
+if(S.v<3){S.v=3;if(allBloomed()){EXTRA.forEach(e=>{if(!S.unlocked.includes(e)){S.unlocked.push(e);logIt("Found a "+SPECIES[e].name+" seed.");}});S.newStuff=true;}save();}   // veterans who finished all six get the new seeds at once
+unlockPass();
 if(!S.unlocked.includes("daisy"))S.unlocked.unshift("daisy");
 intro();renderAll();
 const h0=location.hash.slice(1);if(SCREENS.includes(h0))go(h0);

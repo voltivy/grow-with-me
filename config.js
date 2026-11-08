@@ -1,8 +1,8 @@
-/* ============ CONFIG ============ */
+/* ============ CONFIG: write your own words here ============ */
 const CONFIG = {
   to: "you",
   from: "me",
-  signTitle: "a garden for {to}",
+  signTitle: "for {to}",
   signMessage: "I planted one seed here. The rest is up to us. Take your time.",
   memories: {
     daisy: "Remember the first time we talked for hours and it felt like minutes?",
@@ -10,7 +10,12 @@ const CONFIG = {
     sunflower: "Whenever you laugh, the whole day gets brighter.",
     lavender: "The quiet evenings are my favourites, because of who is in them.",
     forgetmenot: "I won't forget the little things. Not one of them.",
-    rose: "Remember that time we couldn't stop laughing?"
+    rose: "Remember that time we couldn't stop laughing?",
+    poppy: "You are braver than you think, and I've seen it more than once.",
+    cosmos: "Some days we talk about everything, and some days about nothing. I love both.",
+    bluebell: "Hearing your voice is the part of my day I look forward to most.",
+    marigold: "You make even the busiest days feel warm.",
+    iris: "However far apart we are, I'm still thinking of you."
   },
   moonMessage: "The moon told me a secret: whatever the night is like, I'm glad we're under the same sky.",
   butterflyMessage: "The butterfly whispered: you make ordinary days feel like something worth keeping.",

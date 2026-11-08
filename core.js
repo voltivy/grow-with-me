@@ -7,9 +7,16 @@ const SPECIES = {
   lavender:   {name:"Lavender",      line:"Calm. Smells like the end of a long day.",         color:"#9C86CE", stem:14},
   forgetmenot:{name:"Forget-me-not", line:"Small, blue, and impossible to forget.",           color:"#8FB2E8", stem:12},
   rose:       {name:"Rose",          line:"Takes its time. Worth the wait.",                  color:"#C84B72", stem:19},
+  poppy:      {name:"Poppy",         line:"Bright, brave, and a little dramatic.",            color:"#E5533D", stem:18},
+  cosmos:     {name:"Cosmos",        line:"Light as air. Dances in any breeze.",              color:"#F08FB5", stem:22},
+  bluebell:   {name:"Bluebell",      line:"Bows its head, but only to listen.",               color:"#6F8FE0", stem:16},
+  marigold:   {name:"Marigold",      line:"Warm, loud and impossible to ignore.",             color:"#F28C28", stem:15},
+  iris:       {name:"Iris",          line:"Elegant, and quietly proud of it.",                color:"#8D6FD6", stem:24},
   moonpetal:  {name:"Moonpetal",     line:"Only grows when two flowers stay close.",          color:"#CFC3F2", stem:20}
 };
 const BASE = ["daisy","tulip","sunflower","lavender","forgetmenot","rose"];
+const EXTRA = ["poppy","cosmos","bluebell","marigold","iris"];   // bonus flowers, not needed for the Everlasting Flower
+const ORDER = BASE.concat(EXTRA);
 const STAGE_NAMES = ["Seed","Sprout","Bud","Bloom"];
 const NEED = 2;            // waterings per stage
 const IDLE_SECS = 150;     // optional: a watered plant also grows by itself, slowly
@@ -19,10 +26,13 @@ const TOTAL_MSGS = 8;      // 6 flowers + moon + butterfly
 const KEY = "growwithme.v1";
 const $ = (s,e=document)=>e.querySelector(s);
 const $$ = (s,e=document)=>[...e.querySelectorAll(s)];
-function fresh(){return {plots:Array(6).fill(null),unlocked:["daisy"],bloomedSp:{},found:{},stats:{planted:0,bloomed:0,watered:0},
-  log:[],miles:{},notes:"",pair:false,letterRead:false,secretSeen:false,tool:"seed",seed:"daisy",custom:{},last:Date.now(),started:false};}
+function fresh(){return {plots:Array(8).fill(null),unlocked:["daisy"],bloomedSp:{},found:{},stats:{planted:0,bloomed:0,watered:0},
+  log:[],miles:{},notes:"",pair:false,letterRead:false,secretSeen:false,tool:"seed",seed:"daisy",custom:{},last:Date.now(),started:false,v:3,newStuff:false};}
 let S = fresh();
-function load(){try{const r=localStorage.getItem(KEY);if(r){S=Object.assign(fresh(),JSON.parse(r));}}catch(e){}}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);S=Object.assign(fresh(),o);
+  if(!o.v){S.newStuff=true;S.v=2;                       // saved before the 8-plot update
+    if(Array.isArray(o.plots)&&o.plots.length===6){S.plots=Array(8).fill(null);o.plots.forEach((p,i)=>{S.plots[((i/3)|0)*4+(i%3)]=p;});}}}}catch(e){}}
+function unlockPass(){const got=[];for(let i=1;i<ORDER.length;i++){if(S.bloomedSp[ORDER[i-1]]&&!S.unlocked.includes(ORDER[i])){S.unlocked.push(ORDER[i]);logIt("Found a "+SPECIES[ORDER[i]].name+" seed.");got.push(ORDER[i]);}}return got;}
 function save(){S.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const cfg = ()=>{const c=S.custom||{};return {
   to:c.to||CONFIG.to, from:c.from||CONFIG.from, signMessage:c.signMessage||CONFIG.signMessage,
@@ -33,7 +43,9 @@ const cfg = ()=>{const c=S.custom||{};return {
 function logIt(t){S.log.unshift({t:Date.now(),text:t});if(S.log.length>80)S.log.length=80;}
 function mile(id,text){if(!S.miles[id]){S.miles[id]={t:Date.now(),text};logIt(text);}}
 const fmt = t=>new Date(t).toLocaleDateString(undefined,{day:"numeric",month:"short"});
-const msgCount = ()=>Object.keys(S.found).filter(k=>S.found[k]).length;
+const CORE_KEYS = BASE.concat(["moon","butterfly"]);
+const msgCount = ()=>CORE_KEYS.filter(k=>S.found[k]).length;
+const bonusCount = ()=>EXTRA.filter(k=>S.found[k]).length;
 const allBloomed = ()=>BASE.every(s=>S.bloomedSp[s]);
 const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 

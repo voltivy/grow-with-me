@@ -1,5 +1,5 @@
-
-/* ======================== */
+/* Pixel drawing and scenes */
+/* ============ Pixel drawing ============ */
 const R=(c,col,x,y,w,h)=>{c.fillStyle=col;c.fillRect(Math.floor(x),Math.floor(y),w,h);};
 const G1="#4a8238", G2="#79b445", GL="#A7C69A";
 
@@ -24,6 +24,22 @@ function head(c,sp,cx,cy,t){
     R(c,"#8E2E52",cx-3,cy-5,7,10);R(c,"#8E2E52",cx-5,cy-3,11,6);
     R(c,"#C84B72",cx-3,cy-4,7,8);R(c,"#C84B72",cx-4,cy-2,9,4);
     R(c,"#E0708F",cx-2,cy-3,3,1);R(c,"#E0708F",cx-3,cy-2,1,3);R(c,"#F0A0B8",cx-1,cy-1,2,1);R(c,"#8E2E52",cx,cy+1,2,1);R(c,"#8E2E52",cx-2,cy,1,2);
+  }else if(sp==="poppy"){
+    [[-3,-5,7],[-5,-4,11],[-5,-3,11],[-5,-2,11],[-5,-1,11],[-5,0,11],[-5,1,11],[-5,2,11],[-4,3,9],[-3,4,7]].forEach(([x,y,w])=>R(c,"#E5533D",cx+x,cy+y,w,1));
+    R(c,"#C23B2E",cx,cy-5,1,10);R(c,"#C23B2E",cx-5,cy,11,1);R(c,"#F27A63",cx-4,cy-3,2,2);R(c,"#2a1830",cx-2,cy-2,5,5);R(c,"#5a4060",cx-1,cy-1,1,1);
+  }else if(sp==="cosmos"){
+    [[-1,-7,3,4],[-1,3,3,4],[-7,-1,4,3],[3,-1,4,3],[-5,-5,3,3],[3,-5,3,3],[-5,3,3,3],[3,3,3,3]].forEach(([x,y,w,h],i)=>{R(c,"#F08FB5",cx+x,cy+y,w,h);if(i<4)R(c,"#F7B8D0",cx+x,cy+y,1,1);});
+    R(c,"#F2B93B",cx-2,cy-2,5,5);R(c,"#FFE08A",cx-1,cy-1,2,2);
+  }else if(sp==="bluebell"){
+    R(c,G1,cx-4,cy-5,1,9);R(c,G1,cx-3,cy-6,5,1);R(c,G1,cx+2,cy-5,1,2);
+    [[0,-4],[5,-1],[-3,1]].forEach(([x,y])=>{const X=cx+x,Y=cy+y;R(c,"#6F8FE0",X-1,Y,3,1);R(c,"#6F8FE0",X-2,Y+1,5,2);R(c,"#6F8FE0",X-3,Y+3,7,2);R(c,"#A9BDF2",X-1,Y+1,1,3);R(c,"#4A66B8",X-3,Y+4,7,1);});
+  }else if(sp==="marigold"){
+    R(c,"#D9701A",cx-4,cy-5,9,11);R(c,"#D9701A",cx-6,cy-3,13,7);R(c,"#F28C28",cx-5,cy-4,11,9);R(c,"#F28C28",cx-3,cy-6,7,13);
+    R(c,"#F7B955",cx-3,cy-3,7,7);R(c,"#F28C28",cx-2,cy-2,5,5);R(c,"#C85A12",cx-1,cy-1,3,3);R(c,"#FFD98A",cx-4,cy-4,2,1);R(c,"#FFD98A",cx+2,cy+3,2,1);
+  }else if(sp==="iris"){
+    R(c,"#6A4DB8",cx-7,cy+0,5,6);R(c,"#6A4DB8",cx+3,cy+0,5,6);R(c,"#8D6FD6",cx-6,cy+0,4,4);R(c,"#8D6FD6",cx+3,cy+0,4,4);
+    R(c,"#B79CF0",cx-6,cy-6,3,6);R(c,"#B79CF0",cx+4,cy-6,3,6);R(c,"#8D6FD6",cx-2,cy-9,5,9);R(c,"#C9B6F7",cx-1,cy-8,2,4);
+    R(c,"#F2D98C",cx-1,cy-1,3,6);R(c,"#E9B84A",cx,cy+1,1,3);
   }else if(sp==="moonpetal"){
     const k=.5+.5*Math.sin(t*3);
     R(c,"#CFC3F2",cx-1,cy-7,3,15);R(c,"#CFC3F2",cx-7,cy-1,15,3);
@@ -97,18 +113,18 @@ function ground(c,t){
   tufts.forEach(g=>{R(c,g.c,g.x,g.y,1,2);R(c,g.c,g.x+1,g.y-1,1,3);R(c,g.c,g.x+2,g.y,1,2);});
 }
 function sign(c,t,cfgv){
-  const bx=34,by=136;R(c,"#4a3228",bx-1,by-14,4,22);R(c,"#5a3f33",bx-1,by-14,3,22);
+  const bx=26,by=136;R(c,"#4a3228",bx-1,by-14,4,22);R(c,"#5a3f33",bx-1,by-14,3,22);
   R(c,"#3b2820",bx-25,by-31,50,20);R(c,"#7a5642",bx-24,by-30,48,18);R(c,"#8d6750",bx-24,by-30,48,2);
   let fs=8;c.font=fs+"px 'Pixelify Sans', monospace";let w=c.measureText(cfgv.signTitle).width;
   while(w>42&&fs>5){fs--;c.font=fs+"px 'Pixelify Sans', monospace";w=c.measureText(cfgv.signTitle).width;}
   c.fillStyle="#f6e5cb";c.textAlign="center";c.textBaseline="middle";c.fillText(cfgv.signTitle,bx,by-21);c.textAlign="left";
   const k=Math.sin(t*3)>0?1:0;R(c,"#F2D98C",bx+21,by-36-k,1,3);R(c,"#F2D98C",bx+20,by-35-k,3,1);
 }
-const PX=[100,160,220], PY=[132,174];
-const plotPos=i=>({x:PX[i%3],y:PY[(i/3)|0]});
+const PX=[76,132,188,244], PY=[132,174];
+const plotPos=i=>({x:PX[i%4],y:PY[(i/4)|0]});
 function drawPlots(c,t,hover){
-  for(let row=0;row<2;row++)for(let col=0;col<3;col++){
-    const i=row*3+col,{x,y}=plotPos(i),p=S.plots[i];
+  for(let row=0;row<2;row++)for(let col=0;col<4;col++){
+    const i=row*4+col,{x,y}=plotPos(i),p=S.plots[i];
     const wet=p&&p.water>35;
     R(c,"#171521",x-18,y-6,36,14);R(c,wet?"#2a2440":"#3a3350",x-17,y-6,34,12);
     R(c,wet?"#221d33":"#2f2943",x-14,y-3,28,1);R(c,wet?"#221d33":"#2f2943",x-14,y+1,28,1);
@@ -158,7 +174,7 @@ function moveButterfly(dt){
   if(bf.trail>0){bf.trail-=dt;if(Math.random()<.7)spawn(1,{x:bf.x,y:bf.y+3,vx:(Math.random()-.5)*10,vy:Math.random()*8,g:10,life:1,max:1,col:Math.random()>.5?"#F2D98C":"#D79BBF",type:"star"});}
 }
 
-
+/* ---- Secret garden scene ---- */
 function drawSecret(c,t,dt,st){
   c.imageSmoothingEnabled=false;
   R(c,"#0f0d1c",0,0,320,200);R(c,"#141029",0,0,320,70);
