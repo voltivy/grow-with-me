@@ -271,7 +271,7 @@ function frame(ms){
 }
 load();
 if(!Array.isArray(S.plots)||S.plots.length!==8)S.plots=Array(8).fill(null);
-if(S.v<3){S.v=3;if(allBloomed()){EXTRA.forEach(e=>{if(!S.unlocked.includes(e)){S.unlocked.push(e);logIt("Found a "+SPECIES[e].name+" seed.");}});S.newStuff=true;}save();}   // veterans who finished all six get the new seeds at once
+if(S.v<4){S.v=4;EXTRA.forEach(e=>{const i=ORDER.indexOf(e);if(!S.bloomedSp[e]&&!S.bloomedSp[ORDER[i-1]]&&!S.plots.some(p=>p&&p.sp===e))S.unlocked=S.unlocked.filter(u=>u!==e);});if(!S.unlocked.includes(S.seed))S.seed="daisy";save();}   // new flowers unlock one at a time for everyone
 unlockPass();
 if(!S.unlocked.includes("daisy"))S.unlocked.unshift("daisy");
 intro();renderAll();

@@ -27,7 +27,7 @@ const KEY = "growwithme.v1";
 const $ = (s,e=document)=>e.querySelector(s);
 const $$ = (s,e=document)=>[...e.querySelectorAll(s)];
 function fresh(){return {plots:Array(8).fill(null),unlocked:["daisy"],bloomedSp:{},found:{},stats:{planted:0,bloomed:0,watered:0},
-  log:[],miles:{},notes:"",pair:false,letterRead:false,secretSeen:false,tool:"seed",seed:"daisy",custom:{},last:Date.now(),started:false,v:3,newStuff:false};}
+  log:[],miles:{},notes:"",pair:false,letterRead:false,secretSeen:false,tool:"seed",seed:"daisy",custom:{},last:Date.now(),started:false,v:4,newStuff:false};}
 let S = fresh();
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);S=Object.assign(fresh(),o);
   if(!o.v){S.newStuff=true;S.v=2;                       // saved before the 8-plot update
