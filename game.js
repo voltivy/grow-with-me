@@ -221,6 +221,7 @@ $$("[data-go]").forEach(b=>b.addEventListener("click",()=>{sfx("tap");go(b.datas
 addEventListener("hashchange",()=>go(location.hash.slice(1)));
 $$("[data-tool]").forEach(b=>b.addEventListener("click",()=>{S.tool=b.dataset.tool;sfx("tap");save();renderTools();
   setStatus(S.tool==="seed"?"Click a patch of soil to plant.":S.tool==="can"?"Click a plant to water it.":"Click a plant to dig it up.");}));
+$("#btn-full").addEventListener("click",()=>{const el=$("#s-garden");try{if(document.fullscreenElement)document.exitFullscreen();else el.requestFullscreen().catch(()=>setStatus("Full screen is not available here."));}catch(e){setStatus("Full screen is not available here.");}});
 $("#btn-music").addEventListener("click",()=>{S.music=!musicOn;music(S.music);save();});
 
 /* ============ Personalise ============ */
