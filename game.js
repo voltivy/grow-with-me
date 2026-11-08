@@ -1,5 +1,5 @@
-/* Game logic, input, screens, main loop */
-/* ============ Dialog ============ */
+
+/* ============ dialog ============ */
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const dlgs = {g:{box:$("#dlg"),who:$("#dlg-who"),txt:$("#dlg-txt"),timer:null,full:""},
               s:{box:$("#dlg2"),who:$("#dlg2-who"),txt:$("#dlg2-txt"),timer:null,full:""}};
@@ -11,7 +11,7 @@ function say(who,text,k="g"){
 Object.values(dlgs).forEach(d=>d.box.addEventListener("click",()=>{
   if(d.txt.textContent.length<d.full.length){clearInterval(d.timer);d.txt.textContent=d.full;}else d.box.classList.remove("show");sfx("tap");}));
 
-/* ============ Status line ============ */
+
 let flash="",flashUntil=0;
 function setStatus(t,ms=3200){flash=t;flashUntil=performance.now()+ms;renderStatus();}
 function guide(){
@@ -34,7 +34,7 @@ function renderStatus(){
   if(el._last!==t){el.innerHTML=t;el._last=t;}
 }
 
-/* ============ Game logic ============ */
+
 const st={hover:-1,moonWob:0};
 let digArm=-1,digUntil=0,moonClicks=0,moonLast=0;
 const msgsLeftNote=()=>msgCount()>=TOTAL_MSGS?" The Everlasting Flower is waiting in the Secret Garden.":"";
@@ -107,7 +107,7 @@ function digAt(i){
   else{digArm=i;digUntil=performance.now()+2500;setStatus("Click again to dig up the "+n+".");}
 }
 
-/* ============ Input on the garden canvas ============ */
+
 const cv=$("#cv"),c1=cv.getContext("2d"),cv2=$("#cv2"),c2=cv2.getContext("2d");
 function lp(e,cvs){const r=cvs.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*320,y:(e.clientY-r.top)/r.height*200};}
 function hit(p){
@@ -140,7 +140,7 @@ cv2.addEventListener("click",()=>{
   else{sfx("tap");say("The Everlasting Flower","It is still asleep. "+msgCount()+" of "+TOTAL_MSGS+" hidden messages found. Look inside the flowers, and check the moon, the butterfly and the sign.","s");}
 });
 
-/* ============ Letter & ending ============ */
+/* ============ ending ============ */
 function openLetter(){
   const c=cfg();$("#letter").innerHTML=c.letter.split(/\n\s*\n/).map(p=>"<p>"+esc(p)+"</p>").join("")+'<div class="sig">— '+esc(c.from)+"</div>";
   $("#ov-letter").classList.add("show");
@@ -150,7 +150,7 @@ $("#btn-letter-close").addEventListener("click",()=>{$("#ov-letter").classList.r
   if(!S.letterRead){S.letterRead=true;save();$("#end-txt").textContent=cfg().ending;$("#ov-end").classList.add("show");}});
 $("#btn-end-close").addEventListener("click",()=>$("#ov-end").classList.remove("show"));
 
-/* ============ Screens ============ */
+/* ======================== */
 function mk(w,h,fn,cls){const k=document.createElement("canvas");k.width=w;k.height=h;if(cls)k.className=cls;fn(k.getContext("2d"));return k;}
 function spCanvas(sp,stg,cls){return mk(32,40,c=>{R(c,"#3a3350",3,36,26,4);R(c,"#4a3f6b",3,36,26,1);plant(c,sp,stg,16,37,1,0);},cls);}
 function renderTools(){
@@ -208,7 +208,7 @@ function renderSecret(){
 }
 function renderAll(){renderTools();renderSeeds();renderMemories();renderJournal();renderSecret();renderStatus();}
 
-/* ============ Navigation ============ */
+/* ======================== */
 const SCREENS=["garden","seeds","memories","journal","secret"];
 function go(name){
   if(!SCREENS.includes(name))name="garden";
@@ -223,7 +223,7 @@ $$("[data-tool]").forEach(b=>b.addEventListener("click",()=>{S.tool=b.dataset.to
   setStatus(S.tool==="seed"?"Click a patch of soil to plant.":S.tool==="can"?"Click a plant to water it.":"Click a plant to dig it up.");}));
 $("#btn-music").addEventListener("click",()=>{S.music=!musicOn;music(S.music);save();});
 
-/* ============ Personalise ============ */
+/* ======================== */
 const CF=[["to","Their name","text"],["from","Your name","text"],["signMessage","Message on the sign","area"]]
   .concat(BASE.map(b=>["m_"+b,SPECIES[b].name+" memory","area"])).concat([["moonMessage","Moon's secret","area"],["butterflyMessage","Butterfly's whisper","area"],["letter","The Everlasting letter","area"]]);
 function openCustom(){
@@ -237,7 +237,7 @@ $("#btn-custom-save").addEventListener("click",()=>{
   S.custom=o;save();$("#ov-custom").classList.remove("show");renderAll();setStatus("Saved.");});
 $("#btn-custom-reset").addEventListener("click",()=>{S.custom={};save();openCustom();renderAll();});
 
-/* ============ Start, catch-up, loop ============ */
+/* ======================== */
 function catchUp(){
   const away=(Date.now()-S.last)/1000,units=Math.min(5,Math.floor(away/IDLE_SECS));if(units<1)return false;
   let changed=false;S.plots.forEach((p,i)=>{if(!p)return;for(let u=0;u<units&&p.stage<3;u++){p.prog++;changed=true;if(p.prog>=NEED)grow(p,i);}p.water=Math.max(0,p.water-away*.8);});

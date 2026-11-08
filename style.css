@@ -1,4 +1,3 @@
-/* Layout: one night-garden stage (canvas) framed by a quiet pixel UI; five screens share one tab bar. */
 :root{
   --night:#171521; --soil:#29253B; --lavender:#77669F; --blossom:#D79BBF; --sage:#A7C69A;
   --panel:#201c2f; --line:#3d3558; --ink:#EFE8F6; --mute:#a198ba; --gold:#F2D98C; --deep:#0e0c16;

@@ -1,4 +1,4 @@
-/* ============ CONFIG: write your own words here ============ */
+/* ============ CONFIG ============ */
 const CONFIG = {
   to: "you",
   from: "me",

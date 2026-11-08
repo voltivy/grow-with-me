@@ -1,5 +1,5 @@
-/* Pixel drawing and scenes */
-/* ============ Pixel drawing ============ */
+
+/* ======================== */
 const R=(c,col,x,y,w,h)=>{c.fillStyle=col;c.fillRect(Math.floor(x),Math.floor(y),w,h);};
 const G1="#4a8238", G2="#79b445", GL="#A7C69A";
 
@@ -158,7 +158,7 @@ function moveButterfly(dt){
   if(bf.trail>0){bf.trail-=dt;if(Math.random()<.7)spawn(1,{x:bf.x,y:bf.y+3,vx:(Math.random()-.5)*10,vy:Math.random()*8,g:10,life:1,max:1,col:Math.random()>.5?"#F2D98C":"#D79BBF",type:"star"});}
 }
 
-/* ---- Secret garden scene ---- */
+
 function drawSecret(c,t,dt,st){
   c.imageSmoothingEnabled=false;
   R(c,"#0f0d1c",0,0,320,200);R(c,"#141029",0,0,320,70);
